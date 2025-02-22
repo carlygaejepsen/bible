@@ -1,10 +1,22 @@
-// Load Bible data
 async function fetchVerse() {
-    let query = document.getElementById("search").value;
-    let response = await fetch("bible.json");
-    let bible = await response.json();
-    
-    document.getElementById("verse-text").innerText = bible[query] || "Verse not found!";
+    const input = document.getElementById("search").value.trim();
+    const [book, chapterVerse] = input.split(' ', 2);
+    const [chapter, verse] = chapterVerse.split(':');
+
+    try {
+        const response = await fetch(`data/books/${book.toLowerCase()}.json`);
+        const data = await response.json();
+        const verseText = data.find(v => v.chapterNumber == chapter && v.verseNumber == verse);
+
+        if (verseText) {
+            document.getElementById("verse-text").innerText = verseText.value;
+        } else {
+            document.getElementById("verse-text").innerText = "Verse not found.";
+        }
+    } catch (error) {
+        console.error("Error fetching verse:", error);
+        document.getElementById("verse-text").innerText = "Error loading verse.";
+    }
 }
 
 // Load topical sections
